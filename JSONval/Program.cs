@@ -25,7 +25,8 @@ namespace SIBAS_PN
 		}
 
 		~JSONValidator() {
-			textreader.Close();
+			if (textreader != null)
+				textreader.Close();
 		}
 
 		public JSchema SibasPN_Schema {
