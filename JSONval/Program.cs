@@ -11,10 +11,13 @@ namespace SIBAS_PN
 	class JSONValidator {
 		private readonly string jsonFile;
 		private readonly string schemaFile;
-		private const string basicSchema = @"{'$schema' : 'https://json-schema.org/draft/2019-09/schema'}";
+		private const string dummySchema = @"{'$schema' : 'https://json-schema.org/draft/2019-09/schema'}";
+		
 		private JSchema jschema = null;
 		private JObject jobject = null;
+		
 		private IList<string> messages;
+		
 		private StreamReader streamreader;
 		private JsonTextReader textreader = null;
 
@@ -25,8 +28,7 @@ namespace SIBAS_PN
 		}
 
 		~JSONValidator() {
-			if (textreader != null)
-				textreader.Close();
+			textreader?.Close();
 		}
 
 		public JSchema SibasPN_Schema {
@@ -41,12 +43,11 @@ namespace SIBAS_PN
 							}
 							catch (JsonReaderException error) {
 								Console.WriteLine(error);
-								Console.WriteLine(messages);
 							}
 					}
 					// use default (build-in) schema
 					else {
-						jschema = JSchema.Parse(basicSchema);
+						jschema = JSchema.Parse(dummySchema);
 					}
 				}
 				return jschema;
@@ -56,10 +57,15 @@ namespace SIBAS_PN
 		public JObject SibasPN_JSONfile {
 			get {
 				if (jobject == null) {
-					using (streamreader = File.OpenText(jsonFile)) {
-						textreader = new JsonTextReader(streamreader) { CloseInput = true };
-						jobject = JToken.ReadFrom(textreader = new JsonTextReader(streamreader)) as JObject;
-					}
+					using (streamreader = File.OpenText(jsonFile))
+						try {
+							textreader = new JsonTextReader(streamreader) { CloseInput = true };
+							jobject = JToken.ReadFrom(textreader = new JsonTextReader(streamreader)) as JObject;
+						}
+						catch (JsonReaderException error) {
+							Console.WriteLine(error);
+							
+						}
 				}
 				return jobject;
 			}
@@ -71,6 +77,7 @@ namespace SIBAS_PN
 					return SibasPN_JSONfile.IsValid(SibasPN_Schema, out messages);
 				}
 				catch (Exception error) {
+					Console.WriteLine(messages);
 					if (schemaFile == null) {
 						Console.WriteLine("Schema file is missing!");
 						Console.WriteLine($"{error}");
