@@ -102,9 +102,9 @@ namespace SIBAS_PN
 			}
 			else {
 				JSONValidator jsonVal = new JSONValidator(args);
-				Console.WriteLine("Validation result:");
-				Console.WriteLine(jsonVal.SchemaValid);
-				Console.WriteLine(jsonVal.Messages?.ToString());
+				Console.WriteLine("Validation results:");
+				Console.WriteLine("Validation was {0}.", jsonVal.SchemaValid.ToString().ToLower());
+				Console.WriteLine(jsonVal.Messages == null ? jsonVal.Messages.ToString() : "No schema errors.");
 			}
 		}
 	}
