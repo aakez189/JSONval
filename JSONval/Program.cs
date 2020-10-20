@@ -15,8 +15,8 @@ namespace SIBAS_PN
 		
 		private JSchema jschema = null;
 		private JObject jobject = null;
-		
-		private IList<string> messages;
+
+		private IList<ValidationError> messages;
 		
 		private StreamReader streamreader;
 		private JsonTextReader textreader = null;
@@ -64,7 +64,6 @@ namespace SIBAS_PN
 						}
 						catch (JsonReaderException error) {
 							Console.WriteLine(error);
-							
 						}
 				}
 				return jobject;
@@ -77,14 +76,15 @@ namespace SIBAS_PN
 					return SibasPN_JSONfile.IsValid(SibasPN_Schema, out messages);
 				}
 				catch (Exception error) {
-					Console.WriteLine(messages);
-					if (schemaFile == null) {
-						Console.WriteLine("Schema file is missing!");
-						Console.WriteLine($"{error}");
-					}
-					return false;
+					Console.WriteLine($"{error}");
 				}
+				return false;
 			}
+		}
+
+		public IList<ValidationError> Messages { 
+			get => messages; 
+			set => messages = value; 
 		}
 	}
 
@@ -104,6 +104,7 @@ namespace SIBAS_PN
 				JSONValidator jsonVal = new JSONValidator(args);
 				Console.WriteLine("Validation result:");
 				Console.WriteLine(jsonVal.SchemaValid);
+				Console.WriteLine(jsonVal.Messages?.ToString());
 			}
 		}
 	}
