@@ -38,7 +38,9 @@ namespace SIBAS_PN
 					if (schemaFile != null) {
 						using (streamreader = File.OpenText(schemaFile))
 							try {
-								textreader = new JsonTextReader(streamreader) { CloseInput = true };
+								textreader = new JsonTextReader(streamreader) { 
+									CloseInput = true 
+								};
 								jschema = JSchema.Load(textreader = new JsonTextReader(streamreader));
 							}
 							catch (JsonReaderException error) {
@@ -59,7 +61,9 @@ namespace SIBAS_PN
 				if (jobject == null) {
 					using (streamreader = File.OpenText(jsonFile))
 						try {
-							textreader = new JsonTextReader(streamreader) { CloseInput = true };
+							textreader = new JsonTextReader(streamreader) { 
+								CloseInput = true 
+							};
 							jobject = JToken.ReadFrom(textreader = new JsonTextReader(streamreader)) as JObject;
 						}
 						catch (JsonReaderException error) {
