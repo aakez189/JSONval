@@ -5,13 +5,14 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
+// ReSharper disable All
 
 namespace SIBAS_PN
 {
-	class JSONValidator {
-		private readonly string jsonFile;
-		private readonly string schemaFile;
-		private const string dummySchema = @"{'$schema' : 'https://json-schema.org/draft/2019-09/schema'}";
+	class JsonValidator {
+		private readonly string _jsonFile;
+		private readonly string _schemaFile;
+		private const string _DummySchema = @"{'$schema' : 'https://json-schema.org/draft/2019-09/schema'}";
 		
 		private JSchema jschema = null;
 		private JObject jobject = null;
@@ -21,22 +22,22 @@ namespace SIBAS_PN
 		private StreamReader streamreader;
 		private JsonTextReader textreader = null;
 
-		public JSONValidator(string[] args) {
-			jsonFile = args[0];
+		public JsonValidator(string[] args) {
+			_jsonFile = args[0];
 			if (args.Length == 2)
-				schemaFile = args[1];
+				_schemaFile = args[1];
 		}
 
-		~JSONValidator() {
+		~JsonValidator() {
 			textreader?.Close();
 		}
 
-		public JSchema SibasPN_Schema {
+		private JSchema SibasPnSchema {
 			get {
 				if (jschema == null) {
 					// use given schema
-					if (schemaFile != null) {
-						using (streamreader = File.OpenText(schemaFile))
+					if (_schemaFile != null) {
+						using (streamreader = File.OpenText(_schemaFile))
 							try {
 								textreader = new JsonTextReader(streamreader) { 
 									CloseInput = true 
@@ -49,17 +50,17 @@ namespace SIBAS_PN
 					}
 					// use default (build-in) schema
 					else {
-						jschema = JSchema.Parse(dummySchema);
+						jschema = JSchema.Parse(_DummySchema);
 					}
 				}
 				return jschema;
 			}
 		}
 
-		public JObject SibasPN_JSONfile {
+		private JObject SibasPNJsonfile {
 			get {
 				if (jobject == null) {
-					using (streamreader = File.OpenText(jsonFile))
+					using (streamreader = File.OpenText(_jsonFile))
 						try {
 							textreader = new JsonTextReader(streamreader) { 
 								CloseInput = true 
@@ -77,7 +78,7 @@ namespace SIBAS_PN
 		public bool SchemaValid {
 			get {
 				try {
-					return SibasPN_JSONfile.IsValid(SibasPN_Schema, out messages);
+					return SibasPNJsonfile.IsValid(SibasPnSchema, out messages);
 				}
 				catch (Exception error) {
 					Console.WriteLine($"{error}");
@@ -105,7 +106,7 @@ namespace SIBAS_PN
 				return;
 			}
 			else {
-				JSONValidator jsonVal = new JSONValidator(args);
+				JsonValidator jsonVal = new JsonValidator(args);
 				Console.WriteLine("Validation results:");
 				Console.WriteLine("Validation was {0}.", jsonVal.SchemaValid.ToString().ToLower());
 				Console.WriteLine(jsonVal.Messages == null ? jsonVal.Messages.ToString() : "No schema errors.");
