@@ -1,24 +1,23 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
-// ReSharper disable All
 
-namespace SIBAS_PN
-{
-	class JsonValidator {
+namespace JSONval {
+
+	internal class JsonValidator {
 		private readonly string _jsonFile;
 		private readonly string _schemaFile;
-		private const string _DummySchema = @"{'$schema' : 'https://json-schema.org/draft/2019-09/schema'}";
-		
+		private const string DummySchema = @"{'$schema' : 'https://json-schema.org/draft/2019-09/schema'}";
+
 		private JSchema jschema = null;
 		private JObject jobject = null;
 
 		private IList<ValidationError> messages;
-		
+
 		private StreamReader streamreader;
 		private JsonTextReader textreader = null;
 
@@ -39,8 +38,8 @@ namespace SIBAS_PN
 					if (_schemaFile != null) {
 						using (streamreader = File.OpenText(_schemaFile))
 							try {
-								textreader = new JsonTextReader(streamreader) { 
-									CloseInput = true 
+								textreader = new JsonTextReader(streamreader) {
+									CloseInput = true
 								};
 								jschema = JSchema.Load(textreader = new JsonTextReader(streamreader));
 							}
@@ -50,7 +49,7 @@ namespace SIBAS_PN
 					}
 					// use default (build-in) schema
 					else {
-						jschema = JSchema.Parse(_DummySchema);
+						jschema = JSchema.Parse(DummySchema);
 					}
 				}
 				return jschema;
@@ -62,8 +61,8 @@ namespace SIBAS_PN
 				if (jobject == null) {
 					using (streamreader = File.OpenText(_jsonFile))
 						try {
-							textreader = new JsonTextReader(streamreader) { 
-								CloseInput = true 
+							textreader = new JsonTextReader(streamreader) {
+								CloseInput = true
 							};
 							jobject = JToken.ReadFrom(textreader = new JsonTextReader(streamreader)) as JObject;
 						}
@@ -87,20 +86,20 @@ namespace SIBAS_PN
 			}
 		}
 
-		public IList<ValidationError> Messages { 
-			get => messages; 
-			set => messages = value; 
+		public IList<ValidationError> Messages {
+			get => messages;
+			set => messages = value;
 		}
 	}
 
-	class Start {
+	internal class Start {
+
 		/// <summary>
 		/// args[0] = .json file (mandatory)
 		/// args[1] = schema file (optional)
 		/// </summary>
 		/// <param name="args"></param>
-		static void Main(string[] args)
-		{
+		private static void Main(string[] args) {
 			if (args.Length == 0) {
 				Console.WriteLine("No .json file available!");
 				return;
@@ -109,7 +108,7 @@ namespace SIBAS_PN
 				JsonValidator jsonVal = new JsonValidator(args);
 				Console.WriteLine("Validation results:");
 				Console.WriteLine("Validation was {0}.", jsonVal.SchemaValid.ToString().ToLower());
-				Console.WriteLine(jsonVal.Messages == null ? jsonVal.Messages.ToString() : "No schema errors.");
+				Console.WriteLine(jsonVal.Messages != null ? jsonVal.Messages.ToString() : "No schema errors.");
 			}
 		}
 	}
