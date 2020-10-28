@@ -13,13 +13,13 @@ namespace JSONval {
 		private readonly string _schemaFile;
 		private const string DummySchema = @"{'$schema' : 'https://json-schema.org/draft/2019-09/schema'}";
 
-		private JSchema jschema = null;
-		private JObject jobject = null;
+		private JSchema jschema;
+		private JObject jobject;
 
 		private IList<ValidationError> messages;
 
 		private StreamReader streamreader;
-		private JsonTextReader textreader = null;
+		private JsonTextReader textreader;
 
 		public JsonValidator(string[] args) {
 			_jsonFile = args[0];
@@ -92,8 +92,7 @@ namespace JSONval {
 		}
 	}
 
-	internal class Start {
-
+	public static class Start {
 		/// <summary>
 		/// args[0] = .json file (mandatory)
 		/// args[1] = schema file (optional)
@@ -102,7 +101,6 @@ namespace JSONval {
 		private static void Main(string[] args) {
 			if (args.Length == 0) {
 				Console.WriteLine("No .json file available!");
-				return;
 			}
 			else {
 				JsonValidator jsonVal = new JsonValidator(args);
