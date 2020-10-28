@@ -21,9 +21,9 @@ namespace JSONval {
 		private StreamReader streamreader;
 		private JsonTextReader textreader;
 
-		public JsonValidator(string[] args) {
+		public JsonValidator(IReadOnlyList<string> args) {
 			_jsonFile = args[0];
-			if (args.Length == 2)
+			if (args.Count == 2)
 				_schemaFile = args[1];
 		}
 
@@ -77,7 +77,9 @@ namespace JSONval {
 		public bool SchemaValid {
 			get {
 				try {
-					return SibasPNJsonfile.IsValid(SibasPnSchema, out messages);
+					bool valid = SibasPNJsonfile.IsValid(SibasPnSchema, out messages);
+					Messages = messages;
+					return valid;
 				}
 				catch (Exception error) {
 					Console.WriteLine($"{error}");
@@ -88,7 +90,7 @@ namespace JSONval {
 
 		public IList<ValidationError> Messages {
 			get => messages;
-			set => messages = value;
+			private set => messages = value;
 		}
 	}
 
