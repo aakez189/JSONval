@@ -21,28 +21,17 @@ namespace JSONval {
 		private StreamReader streamreader;
 		private JsonTextReader textreader;
 
-		/// <summary>
-		/// ctor
-		/// </summary>
-		/// <param name="args"></param>
-		public JsonValidator(string[] args) {
+		public JsonValidator(IReadOnlyList<string> args) {
 			_jsonFile = args[0];
-			_schemaFile = (args.Length == 2) ? _schemaFile = args[1] : null;
+			if (args.Count == 2)
+				_schemaFile = args[1];
 		}
 
-		
-		/// <summary>
-		/// dtor
-		/// </summary>
 		~JsonValidator() {
 			textreader?.Close();
 		}
 
-		
-		/// <summary>
-		/// returns the JSON schema
-		/// </summary>
-		private JSchema JsonSchema {
+		private JSchema SibasPnSchema {
 			get {
 				if (jschema == null) {
 					// use given schema
@@ -67,11 +56,7 @@ namespace JSONval {
 			}
 		}
 
-		
-		/// <summary>
-		/// returns the JSON file
-		/// </summary>
-		private JObject JsonFile {
+		private JObject SibasPNJsonfile {
 			get {
 				if (jobject == null) {
 					using (streamreader = File.OpenText(_jsonFile))
@@ -89,14 +74,12 @@ namespace JSONval {
 			}
 		}
 
-		
-		/// <summary>
-		/// validates the JSON file against the JSON schema
-		/// </summary>
 		public bool SchemaValid {
 			get {
 				try {
-					return JsonFile.IsValid(JsonSchema, out messages);
+					bool valid = SibasPNJsonfile.IsValid(SibasPnSchema, out messages);
+					Messages = messages;
+					return valid;
 				}
 				catch (Exception error) {
 					Console.WriteLine($"{error}");
@@ -105,20 +88,12 @@ namespace JSONval {
 			}
 		}
 
-		
-		/// <summary>
-		/// returns any validation problems
-		/// </summary>
 		public IList<ValidationError> Messages {
 			get => messages;
-			set => messages = value;
+			private set => messages = value;
 		}
 	}
 
-	
-	/// <summary>
-	/// App start
-	/// </summary>
 	public static class Start {
 		/// <summary>
 		/// args[0] = .json file (mandatory)
