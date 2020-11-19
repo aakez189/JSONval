@@ -16,9 +16,6 @@ namespace JSONval {
 
 		private JSchema jschema;
 		private JObject jobject;
-
-		private IList<ValidationError> messages;
-
 		private StreamReader streamreader;
 		private JsonTextReader textreader;
 
@@ -49,22 +46,18 @@ namespace JSONval {
 			get {
 				if (jschema == null) {
 					// use given schema
-					if (_schemaFile != null) {
+					if (_schemaFile != null) 
 						using (streamreader = File.OpenText(_schemaFile))
 							try {
-								textreader = new JsonTextReader(streamreader) {
-									CloseInput = true
+								textreader = new JsonTextReader(streamreader) { 
+									CloseInput = true 
 								};
 								jschema = JSchema.Load(textreader = new JsonTextReader(streamreader));
 							}
-							catch (JsonReaderException error) {
-								Console.WriteLine(error);
-							}
-					}
+							catch (JsonReaderException error) { Console.WriteLine(error); }
 					// use default (build-in) schema
-					else {
+					else
 						jschema = JSchema.Parse(DummySchema);
-					}
 				}
 				return jschema;
 			}
@@ -79,8 +72,8 @@ namespace JSONval {
 				if (jobject == null)
 					using (streamreader = File.OpenText(_jsonFile))
 						try {
-							textreader = new JsonTextReader(streamreader) {
-								CloseInput = true
+							textreader = new JsonTextReader(streamreader) { 
+								CloseInput = true 
 							};
 							jobject = JToken.ReadFrom(textreader = new JsonTextReader(streamreader)) as JObject;
 						}
@@ -98,7 +91,7 @@ namespace JSONval {
 		public bool JsonFileIsValid {
 			get {
 				try {
-					bool valid = JsonFile.IsValid(JsonSchema, out messages);
+					bool valid = JsonFile.IsValid(JsonSchema, out IList<ValidationError> messages);
 					Messages = messages;
 					return valid;
 				}
@@ -111,8 +104,8 @@ namespace JSONval {
 
 
 		public IList<ValidationError> Messages {
-			get => messages;
-			private set => messages = value;
+			get; 
+			private set;
 		}
 	}
 
