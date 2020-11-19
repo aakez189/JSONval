@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
 
+
 namespace JSONval {
 
 	internal class JsonValidator {
@@ -21,17 +22,30 @@ namespace JSONval {
 		private StreamReader streamreader;
 		private JsonTextReader textreader;
 
+
+		/// <summary>
+		/// ctor
+		/// </summary>
+		/// <param name="args"></param>
 		public JsonValidator(IReadOnlyList<string> args) {
 			_jsonFile = args[0];
-			if (args.Count == 2)
-				_schemaFile = args[1];
+			if (args.Count > 1)
+				_schemaFile = args[1];	// ignore the rest, if any
 		}
 
+
+		/// <summary>
+		/// dtor
+		/// </summary>
 		~JsonValidator() {
 			textreader?.Close();
 		}
 
-		private JSchema SibasPnSchema {
+
+		/// <summary>
+		/// get JSON schema
+		/// </summary>
+		private JSchema JsonSchema {
 			get {
 				if (jschema == null) {
 					// use given schema
@@ -56,9 +70,13 @@ namespace JSONval {
 			}
 		}
 
-		private JObject SibasPNJsonfile {
+
+		/// <summary>
+		/// get JSON file
+		/// </summary>
+		private JObject JsonFile {
 			get {
-				if (jobject == null) {
+				if (jobject == null)
 					using (streamreader = File.OpenText(_jsonFile))
 						try {
 							textreader = new JsonTextReader(streamreader) {
@@ -69,15 +87,18 @@ namespace JSONval {
 						catch (JsonReaderException error) {
 							Console.WriteLine(error);
 						}
-				}
 				return jobject;
 			}
 		}
 
-		public bool SchemaValid {
+
+		/// <summary>
+		/// validate JSON file against JSON schema
+		/// </summary>
+		public bool JsonFileIsValid {
 			get {
 				try {
-					bool valid = SibasPNJsonfile.IsValid(SibasPnSchema, out messages);
+					bool valid = JsonFile.IsValid(JsonSchema, out messages);
 					Messages = messages;
 					return valid;
 				}
@@ -88,11 +109,13 @@ namespace JSONval {
 			}
 		}
 
+
 		public IList<ValidationError> Messages {
 			get => messages;
 			private set => messages = value;
 		}
 	}
+
 
 	public static class Start {
 		/// <summary>
@@ -107,7 +130,7 @@ namespace JSONval {
 			else {
 				JsonValidator jsonVal = new JsonValidator(args);
 				Console.WriteLine("Validation results:");
-				Console.WriteLine("Validation was {0}.", jsonVal.SchemaValid.ToString().ToLower());
+				Console.WriteLine("Validation was {0}.", jsonVal.JsonFileIsValid.ToString().ToLower());
 				Console.WriteLine(jsonVal.Messages != null ? jsonVal.Messages.ToString() : "No schema errors.");
 			}
 		}
