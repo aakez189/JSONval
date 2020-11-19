@@ -11,7 +11,7 @@ namespace JSONval {
 
 	internal class JsonValidator {
 		private readonly string _jsonFile;
-		private readonly string _schemaFile;
+		private string _schemaFile;
 		private const string DummySchema = @"{'$schema' : 'https://json-schema.org/draft/2019-09/schema'}";
 
 		private JSchema jschema;
@@ -45,19 +45,19 @@ namespace JSONval {
 		private JSchema JsonSchema {
 			get {
 				if (jschema == null) {
-					// use given schema
-					if (_schemaFile != null) 
-						using (streamreader = File.OpenText(_schemaFile))
-							try {
-								textreader = new JsonTextReader(streamreader) { 
-									CloseInput = true 
-								};
-								jschema = JSchema.Load(textreader = new JsonTextReader(streamreader));
-							}
-							catch (JsonReaderException error) { Console.WriteLine(error); }
-					// use default (build-in) schema
-					else
-						jschema = JSchema.Parse(DummySchema);
+					if (_schemaFile == null)
+						_schemaFile = DummySchema;
+
+					using (streamreader = File.OpenText(_schemaFile))
+						try {
+							textreader = new JsonTextReader(streamreader) { 
+								CloseInput = true 
+							};
+							jschema = JSchema.Load(textreader);
+						}
+						catch (JsonReaderException error) { 
+							Console.WriteLine(error); 
+						}
 				}
 				return jschema;
 			}
@@ -75,7 +75,7 @@ namespace JSONval {
 							textreader = new JsonTextReader(streamreader) { 
 								CloseInput = true 
 							};
-							jobject = JToken.ReadFrom(textreader = new JsonTextReader(streamreader)) as JObject;
+							jobject = JToken.ReadFrom(textreader) as JObject;
 						}
 						catch (JsonReaderException error) {
 							Console.WriteLine(error);
