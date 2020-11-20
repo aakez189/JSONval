@@ -11,8 +11,8 @@ namespace JSONval {
 
 	internal class JsonValidator {
 		private readonly string _jsonFile;
-		private string _schemaFile;
-		private const string DummySchema = @"{'$schema' : 'https://json-schema.org/draft/2019-09/schema'}";
+		private readonly string _schemaFile;
+		private const string DummySchema = @"'$schema' : 'https://json-schema.org/draft/2019-09/schema'";
 
 		private JSchema jschema;
 		private JObject jobject;
@@ -26,8 +26,7 @@ namespace JSONval {
 		/// <param name="args"></param>
 		public JsonValidator(IReadOnlyList<string> args) {
 			_jsonFile = args[0];
-			if (args.Count > 1)
-				_schemaFile = args[1];	// ignore the rest, if any
+			_schemaFile = (args.Count > 1) ? args[1] : DummySchema; // ignore the rest, if any
 		}
 
 
@@ -44,10 +43,7 @@ namespace JSONval {
 		/// </summary>
 		private JSchema JsonSchema {
 			get {
-				if (jschema == null) {
-					if (_schemaFile == null)
-						_schemaFile = DummySchema;
-
+				if (jschema == null)
 					using (streamreader = File.OpenText(_schemaFile))
 						try {
 							textreader = new JsonTextReader(streamreader) { 
@@ -58,7 +54,6 @@ namespace JSONval {
 						catch (JsonReaderException error) { 
 							Console.WriteLine(error); 
 						}
-				}
 				return jschema;
 			}
 		}
@@ -72,8 +67,8 @@ namespace JSONval {
 				if (jobject == null)
 					using (streamreader = File.OpenText(_jsonFile))
 						try {
-							textreader = new JsonTextReader(streamreader) { 
-								CloseInput = true 
+							textreader = new JsonTextReader(streamreader) {
+								CloseInput = true
 							};
 							jobject = JToken.ReadFrom(textreader) as JObject;
 						}
