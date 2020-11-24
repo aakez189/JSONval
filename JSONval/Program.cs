@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Schema;
-
 
 namespace JSONval {
+
+	using Newtonsoft.Json;
+	using Newtonsoft.Json.Linq;
+	using Newtonsoft.Json.Schema;
+
 
 	internal class JsonValidator {
 		private readonly string _jsonFile = null;
@@ -50,7 +51,10 @@ namespace JSONval {
 						textreader = new JsonTextReader(streamreader) { 
 							CloseInput = true 
 						};
-						return JSchema.Load(textreader);
+						return JSchema.Load(textreader, new JSchemaReaderSettings() { 
+							ValidateVersion = true, 
+							ResolveSchemaReferences = true
+						});
 					}
 					catch (JsonReaderException error) { 
 						Console.WriteLine(error);
@@ -63,14 +67,18 @@ namespace JSONval {
 		/// <summary>
 		/// get JSON file
 		/// </summary>
-		private JObject JsonFile {
+		private JToken JsonFile {
 			get {
 				using (streamreader = File.OpenText(_jsonFile))
 					try {
 						textreader = new JsonTextReader(streamreader) {
 							CloseInput = true
 						};
-						return JToken.ReadFrom(textreader) as JObject;
+						return JToken.Load(textreader, new JsonLoadSettings() {
+							DuplicatePropertyNameHandling = DuplicatePropertyNameHandling.Error,
+							CommentHandling = CommentHandling.Load, 
+							LineInfoHandling = LineInfoHandling.Load
+						});
 					}
 					catch (JsonReaderException error) {
 						Console.WriteLine(error);
@@ -91,7 +99,7 @@ namespace JSONval {
 					return valid;
 				}
 				catch (Exception error) {
-					Console.WriteLine($"{error}");
+					Console.WriteLine(error);
 				}
 				return false;
 			}
